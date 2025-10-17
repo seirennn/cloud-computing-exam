@@ -3,14 +3,16 @@ FROM node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
+# Copy package files from ecommerce-app subdirectory
+COPY ecommerce-app/package.json ecommerce-app/package-lock.json* ./
 RUN npm ci
 
 # Rebuild the source code only when needed
 FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+# Copy the entire ecommerce-app directory
+COPY ecommerce-app .
 
 RUN npm run build
 
